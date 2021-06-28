@@ -1,4 +1,4 @@
-package org.pva.WordsFromWordBruteForce;
+package org.pva.wfwbf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
