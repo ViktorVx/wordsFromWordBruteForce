@@ -2,9 +2,14 @@ package org.pva.wfwbf.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.paukov.combinatorics3.Generator;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
@@ -14,36 +19,31 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 public class BruteForceService {
 
     public List<String> bruteForce(String word) {
-        if (isBlank(word))
+        if (isBlank(word) || word.length() == 1)
             return Collections.emptyList();
 
-        //******
-        var arr = List.of("1", "2", "3", "4", "5");
-        var r = 3;
-        int n = arr.size();
-        printCombination(arr, n, r);
-        //******
+        log.info("*******************");
+        var chars = Arrays.stream(word.split("")).collect(Collectors.toList());
+        var combinations = new ArrayList<String>();
+        for (int i = 2; i <= chars.size(); i++) {
+            Generator.combination(chars)
+                    .simple(i)
+                    .stream()
+                    .forEach(cmb -> Generator.permutation(cmb)
+                            .simple()
+                            .stream()
+                            .map(elems -> String.join("", elems))
+                            .forEach(combinations::add)
+                    );
+        }
 
-        var chars = List.of(word.split(""));
+//        for (String combination : combinations) {
+//            log.info(combination);
+//        }
+        log.info("*******************");
+        log.info(String.valueOf(combinations.size()));
+        log.info(combinations.get(0));
+        //******
         return chars;
-    }
-
-    static void combinationUtil(List<String> arr, String[] data, int start, int end, int index, int r) {
-        if (index == r) {
-            for (var j = 0; j < r; j++)
-                log.info(data[j] + " ");
-            log.info("");
-            return;
-        }
-
-        for (int i = start; i <= end && end - i + 1 >= r - index; i++) {
-            data[index] = arr.get(i);
-            combinationUtil(arr, data, i + 1, end, index + 1, r);
-        }
-    }
-
-    static void printCombination(List<String> arr, int n, int r) {
-        var data = new String[r];
-        combinationUtil(arr, data, 0, n - 1, 0, r);
     }
 }
