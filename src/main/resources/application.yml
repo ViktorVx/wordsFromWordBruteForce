@@ -1,0 +1,5 @@
+telegram:
+  bot:
+    wfwbf:
+      name: ${WFWBF_BOT_NAME}
+      token: ${WFWBF_BOT_TOKEN}

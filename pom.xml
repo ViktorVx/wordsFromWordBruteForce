@@ -13,13 +13,22 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>WordsFromWordBruteForce</name>
 	<description>Telegram bot for brute force &quot;Words from word&quot; game</description>
+
 	<properties>
 		<java.version>11</java.version>
+		<lomboc.version>1.18.20</lomboc.version>
+		<maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots-spring-boot-starter</artifactId>
+			<version>5.2.0</version>
 		</dependency>
 
 		<dependency>
@@ -52,6 +61,22 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lomboc.version}</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 		</plugins>

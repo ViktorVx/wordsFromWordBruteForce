@@ -1,4 +1,4 @@
-package org.pva.WordsFromWordBruteForce;
+package org.pva.wfwbf;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
