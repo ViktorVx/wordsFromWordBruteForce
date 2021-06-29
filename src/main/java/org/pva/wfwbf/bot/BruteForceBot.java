@@ -3,9 +3,12 @@ package org.pva.wfwbf.bot;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pva.wfwbf.provider.CredentialProvider;
+import org.pva.wfwbf.service.BruteForceService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 @Slf4j
@@ -13,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class BruteForceBot extends TelegramLongPollingBot {
 
     private final CredentialProvider credentialProvider;
+    private final BruteForceService bruteForceService;
 
     @Override
     public String getBotUsername() {
@@ -27,7 +31,18 @@ public class BruteForceBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update != null && update.getMessage() != null) {
-            log.info(update.getMessage().getText());
+            var words = bruteForceService.bruteForce(update.getMessage().getText());
+            var answer = String.join("\n", words);
+
+
+            var message = new SendMessage(); // Create a SendMessage object with mandatory fields
+            message.setChatId(update.getMessage().getChatId().toString());
+            message.setText(answer);
+            try {
+                execute(message); // Call method to send the message
+            } catch (TelegramApiException e) {
+                log.error(e.toString());
+            }
         }
     }
 }

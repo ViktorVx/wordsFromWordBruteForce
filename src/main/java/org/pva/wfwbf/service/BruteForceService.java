@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.paukov.combinatorics3.Generator;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
@@ -18,14 +18,22 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 @Slf4j
 public class BruteForceService {
 
+    private static final Set<String> dict = new HashSet<>();
+
+    static {
+        loadDictionary(dict, "russian_nouns.txt");
+        log.info(String.valueOf(dict.size()));
+    }
+
     public List<String> bruteForce(String word) {
+        log.info(word);
         if (isBlank(word) || word.length() == 1)
             return Collections.emptyList();
 
-        log.info("*******************");
-        var chars = Arrays.stream(word.split("")).collect(Collectors.toList());
-        var combinations = new ArrayList<String>();
-        for (int i = 2; i <= chars.size(); i++) {
+        var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
+
+        var combinations = new HashSet<String>();
+        for (var i = 2; i <= chars.size(); i++) {
             Generator.combination(chars)
                     .simple(i)
                     .stream()
@@ -33,17 +41,27 @@ public class BruteForceService {
                             .simple()
                             .stream()
                             .map(elems -> String.join("", elems))
+                            .filter(dict::contains)
                             .forEach(combinations::add)
                     );
         }
 
-//        for (String combination : combinations) {
-//            log.info(combination);
-//        }
-        log.info("*******************");
-        log.info(String.valueOf(combinations.size()));
-        log.info(combinations.get(0));
-        //******
-        return chars;
+        var combinationList = new ArrayList<>(combinations);
+        combinationList
+                .sort(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()));
+        return combinationList;
+    }
+
+    private static void loadDictionary(final Set<String> dict, String fileName) {
+        Stream<String> lines = null;
+        try {
+            var path = Paths.get(Objects.requireNonNull(BruteForceService.class.getClassLoader()
+                    .getResource(fileName)).toURI());
+            lines = Files.lines(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (lines != null)
+            lines.forEach(dict::add);
     }
 }
