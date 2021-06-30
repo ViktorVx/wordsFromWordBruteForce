@@ -18,6 +18,25 @@ class WordsFromWordBruteForceServiceApplicationTests {
 
 	@Test
 	void bruteForceTest() {
-		log.info(bruteForceService.bruteForce("СЕМИНАРИСТ").toString());
+//		var urls = urlsText.split("\n");
+//		var words = new HashSet<String>();
+//		WebClient client = WebClient.create();
+//		for (String url : urls) {
+//			WebClient.ResponseSpec responseSpec = client.get()
+//					.uri(url)
+//					.retrieve();
+//			var html = responseSpec.bodyToMono(String.class).block();
+//
+//			String str = String.format("<%s>(.*?)</%s>", "strong", "strong");
+//			Pattern pattern = Pattern.compile(str);
+//			if (html != null) {
+//				Matcher matcher = pattern.matcher(html);
+//				while (matcher.find()) {
+//					words.add(matcher.group(1));
+//				}
+//			}
+//		}
+//		//***
+//		words.forEach(log::info);
 	}
 }
