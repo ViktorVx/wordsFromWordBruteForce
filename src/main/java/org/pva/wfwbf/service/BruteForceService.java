@@ -53,9 +53,14 @@ public class BruteForceService {
         fillAnswerFromForeignApi(combinations, word);
         //***
         var combinationList = new ArrayList<>(combinations);
-        combinationList
-                .sort(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()));
-        return combinationList;
+        var sortedList = combinationList
+                .stream()
+                .map(String::toLowerCase)
+                .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
+                .collect(Collectors.toList());
+        var sortedMap = sortedList.stream().collect(Collectors.groupingBy(String::length, Collectors.toSet()));
+        log.info(sortedMap.toString());
+        return sortedList;
     }
 
     private void fillAnswerFromForeignApi(Set<String> combinations, String word) {
