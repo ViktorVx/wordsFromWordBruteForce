@@ -23,6 +23,8 @@ public class BruteForceService {
     static {
         loadDictionary(dict, "russian_nouns.txt");
         log.info(String.valueOf(dict.size()));
+        loadDictionary(dict, "answers.txt");
+        log.info(String.valueOf(dict.size()));
     }
 
     public List<String> bruteForce(String word) {
