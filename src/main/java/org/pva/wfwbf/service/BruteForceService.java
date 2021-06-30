@@ -29,10 +29,10 @@ public class BruteForceService {
         log.info(String.valueOf(dict.size()));
     }
 
-    public List<String> bruteForce(String word) {
+    public Map<Integer, List<String>> bruteForce(String word) {
         log.info(word);
         if (isBlank(word) || word.length() == 1)
-            return Collections.emptyList();
+            return Collections.emptyMap();
 
         var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
 
@@ -53,9 +53,12 @@ public class BruteForceService {
         fillAnswerFromForeignApi(combinations, word);
         //***
         var combinationList = new ArrayList<>(combinations);
-        combinationList
-                .sort(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()));
-        return combinationList;
+        var sortedList = combinationList
+                .stream()
+                .map(String::toLowerCase)
+                .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
+                .collect(Collectors.toList());
+        return sortedList.stream().collect(Collectors.groupingBy(String::length, Collectors.toList()));
     }
 
     private void fillAnswerFromForeignApi(Set<String> combinations, String word) {

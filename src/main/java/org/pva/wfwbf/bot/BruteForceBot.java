@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pva.wfwbf.provider.CredentialProvider;
 import org.pva.wfwbf.service.BruteForceService;
+import org.pva.wfwbf.util.MessageUtils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -32,8 +33,7 @@ public class BruteForceBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update != null && update.getMessage() != null) {
             var words = bruteForceService.bruteForce(update.getMessage().getText());
-            var answer = String.join("\n", words);
-
+            var answer = MessageUtils.prepareMessage(words);
 
             var message = new SendMessage(); // Create a SendMessage object with mandatory fields
             message.setChatId(update.getMessage().getChatId().toString());
