@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.paukov.combinatorics3.Generator;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,11 +49,30 @@ public class BruteForceService {
                             .forEach(combinations::add)
                     );
         }
-
+        //***
+        fillAnswerFromForeignApi(combinations, word);
+        //***
         var combinationList = new ArrayList<>(combinations);
         combinationList
                 .sort(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()));
         return combinationList;
+    }
+
+    private void fillAnswerFromForeignApi(Set<String> combinations, String word) {
+        var client = WebClient.create();
+        var responseSpec = client.get()
+                .uri(String.format("https://wordparts.ru/anagramma/?word=%s", word.toUpperCase()))
+                .retrieve();
+        var html = responseSpec.bodyToMono(String.class).block();
+
+        var str = String.format("<%s>(.*?)</%s>", "strong", "span");
+        var pattern = Pattern.compile(str);
+        if (html != null) {
+            var matcher = pattern.matcher(html);
+            while (matcher.find()) {
+                combinations.add(matcher.group(1));
+            }
+        }
     }
 
     private static void loadDictionary(final Set<String> dict, String fileName) {
