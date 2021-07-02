@@ -2,16 +2,15 @@ package org.pva.wfwbf.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.paukov.combinatorics3.Generator;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
@@ -84,15 +83,15 @@ public class BruteForceService {
     }
 
     private static void loadDictionary(final Set<String> dict, String fileName) {
-        Stream<String> lines = null;
+        String[] lines = null;
         try {
-            var path = Paths.get(Objects.requireNonNull(BruteForceService.class.getClassLoader()
-                    .getResource(fileName)).toURI());
-            lines = Files.lines(path);
+            var res = BruteForceService.class.getResourceAsStream("/" + fileName);
+            String result = IOUtils.toString(res, StandardCharsets.UTF_8);
+            lines = result.split("\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (lines != null)
-            lines.forEach(dict::add);
+            dict.addAll(Arrays.asList(lines));
     }
 }
