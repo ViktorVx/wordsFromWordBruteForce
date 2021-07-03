@@ -94,6 +94,17 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.heroku.sdk</groupId>
+				<artifactId>heroku-maven-plugin</artifactId>
+				<version>3.0.3</version>
+				<configuration>
+					<appName>wfwbf</appName>
+					<processTypes>
+						<web>java -jar -Dtelegram.bot.wfwbf.name=${bot} -Dtelegram.bot.wfwbf.token=${token} target/WordsFromWordBruteForce-0.0.1-SNAPSHOT.jar</web>
+					</processTypes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
