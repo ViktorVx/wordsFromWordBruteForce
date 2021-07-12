@@ -32,14 +32,17 @@ public class BruteForceBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update != null && update.getMessage() != null) {
-            var words = bruteForceService.bruteForce(update.getMessage().getText());
-            var answer = MessageUtils.prepareMessage(words);
+            var word = update.getMessage().getText();
+            var words = bruteForceService.bruteForce(word);
+            var answers = MessageUtils.prepareMessage(words, word);
 
-            var message = new SendMessage(); // Create a SendMessage object with mandatory fields
-            message.setChatId(update.getMessage().getChatId().toString());
-            message.setText(answer);
             try {
-                execute(message); // Call method to send the message
+                for (String answer : answers) {
+                    var message = new SendMessage(); // Create a SendMessage object with mandatory fields
+                    message.setChatId(update.getMessage().getChatId().toString());
+                    message.setText(answer);
+                    execute(message); // Call method to send the message
+                }
             } catch (TelegramApiException e) {
                 log.error(e.toString());
             }
