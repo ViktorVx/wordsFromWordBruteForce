@@ -20,7 +20,6 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 public class BruteForceService {
 
     private static final Set<String> dict = new HashSet<>();
-    private static final Map<String, List<String>> cache = new HashMap<>();
 
     static {
         loadDictionary(dict, "russian_nouns.txt");
@@ -33,9 +32,6 @@ public class BruteForceService {
         log.info(word);
         if (isBlank(word) || word.length() == 1)
             return Collections.emptyMap();
-        if (cache.containsKey(word.toLowerCase()))
-            return cache.get(word.toLowerCase()).stream().collect(Collectors.groupingBy(String::length, Collectors.toList()));
-
 
         var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
 
@@ -61,7 +57,6 @@ public class BruteForceService {
                 .map(String::toLowerCase)
                 .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
                 .collect(Collectors.toList());
-        cache.put(word.toLowerCase(), sortedList);
         return sortedList.stream().collect(Collectors.groupingBy(String::length, Collectors.toList()));
     }
 
