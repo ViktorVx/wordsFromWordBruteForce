@@ -10,6 +10,10 @@ public class CredentialProvider {
     private String botName;
     @Value("${telegram.bot.wfwbf.token}")
     private String botToken;
+    @Value("${telegram.bot.wfw-terminal.name}")
+    private String terminalBotName;
+    @Value("${telegram.bot.wfw-terminal.token}")
+    private String terminalBotToken;
 
     public String getBotName() {
         return botName;
@@ -17,5 +21,13 @@ public class CredentialProvider {
 
     public String getBotToken() {
         return botToken;
+    }
+
+    public String getTerminalBotName() {
+        return terminalBotName;
+    }
+
+    public String getTerminalBotToken() {
+        return terminalBotToken;
     }
 }
