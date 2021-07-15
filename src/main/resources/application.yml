@@ -5,3 +5,8 @@ telegram:
     wfwbf:
       name: ${WFWBF_BOT_NAME}
       token: ${WFWBF_BOT_TOKEN}
+    wfw-terminal:
+      name: ${WFW_TERMINAL_BOT_NAME}
+      token: ${WFW_TERMINAL_BOT_TOKEN}
+      wakeup-url: ${WFWBF_BOT_WAKEUP_URL}
+      wakeup-timeout: ${WFWBF_BOT_WAKEUP_TIMEOUT}
