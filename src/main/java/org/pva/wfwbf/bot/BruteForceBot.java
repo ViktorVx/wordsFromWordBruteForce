@@ -2,7 +2,7 @@ package org.pva.wfwbf.bot;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pva.wfwbf.provider.CredentialProvider;
+import org.pva.wfwbf.provider.ParamsProvider;
 import org.pva.wfwbf.service.BruteForceService;
 import org.pva.wfwbf.util.MessageUtils;
 import org.springframework.stereotype.Component;
@@ -16,17 +16,17 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @AllArgsConstructor
 public class BruteForceBot extends TelegramLongPollingBot {
 
-    private final CredentialProvider credentialProvider;
+    private final ParamsProvider paramsProvider;
     private final BruteForceService bruteForceService;
 
     @Override
     public String getBotUsername() {
-        return credentialProvider.getBotName();
+        return paramsProvider.getBotName();
     }
 
     @Override
     public String getBotToken() {
-        return credentialProvider.getBotToken();
+        return paramsProvider.getBotToken();
     }
 
     @Override
