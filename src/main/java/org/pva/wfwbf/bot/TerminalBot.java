@@ -10,6 +10,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +24,9 @@ public class TerminalBot extends TelegramLongPollingBot {
 
     private final ParamsProvider paramsProvider;
     private static Boolean schedulerStarted = false;
+    private static String lastHealth;
+    private static Date lastHealthDate;
+    private static DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
     @Override
     public String getBotUsername() {
@@ -36,25 +42,28 @@ public class TerminalBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (!schedulerStarted) {
             ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-            exec.scheduleAtFixedRate(() -> healthCheck(update), 0, paramsProvider.getTerminalBotWakeUpTimeout(), TimeUnit.SECONDS);
+            exec.scheduleAtFixedRate(this::healthCheck, 0, paramsProvider.getTerminalBotWakeUpTimeout(), TimeUnit.SECONDS);
             schedulerStarted = true;
         }
-
+        try {
+            if (lastHealthDate != null && lastHealth != null) {
+                var message = new SendMessage();
+                message.setChatId(update.getMessage().getChatId().toString());
+                message.setText(String.format("%s %s", df.format(lastHealthDate), lastHealth == null ? "FAIL" : lastHealth));
+                execute(message);
+            }
+        } catch (TelegramApiException e) {
+            log.error(e.toString());
+        }
     }
 
-    private void healthCheck(Update update) {
+    private void healthCheck() {
         var responseSpec = WebClient.create()
                 .get()
                 .uri(String.format("%s/health", paramsProvider.getTerminalBotWakeUpUrl()))
                 .retrieve();
-        var health = responseSpec.bodyToMono(String.class).block();
-        try {
-            var message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId().toString());
-            message.setText(health == null ? "FAIL" : health);
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error(e.toString());
-        }
+        lastHealth = responseSpec.bodyToMono(String.class).block();
+        lastHealthDate = new Date();
+        log.info(lastHealth);
     }
 }
