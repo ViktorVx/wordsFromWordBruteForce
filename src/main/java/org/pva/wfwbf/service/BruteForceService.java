@@ -37,7 +37,7 @@ public class BruteForceService {
         var wordLength = word.length();
         var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
         var wordStat = chars.stream().collect(Collectors.groupingBy(c -> c, Collectors.counting()));
-        dictStats.keySet().stream()
+        dictStats.keySet().parallelStream()
                 .filter(w -> w.length() <= wordLength)
                 .filter(w -> {
                     var stat = dictStats.get(w);
