@@ -1,5 +1,6 @@
 package org.pva.wfwbf.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,13 @@ public class MessageUtils {
         letterNumberMap.put(12, "Двеннадцатибуквенные");
     }
 
-    public static String prepareMessage(Map<Integer, List<String>> map) {
-        String msg = "";
+    public static List<String> prepareMessage(Map<Integer, List<String>> map, String word) {
+        var msgs = new ArrayList<String>();
         for (Map.Entry<Integer, List<String>> entry : map.entrySet()) {
-            msg = msg.concat(String.format("%s(%d):\n%s\n", letterNumberMap.get(entry.getKey()),
-                    entry.getValue().size(), String.join(" ", entry.getValue())));
+            var msg = String.format("(%s) %s(%d):\n%s\n", word, letterNumberMap.get(entry.getKey()),
+                    entry.getValue().size(), String.join(" ", entry.getValue()));
+            msgs.add(msg);
         }
-        return msg;
+        return msgs;
     }
 }
