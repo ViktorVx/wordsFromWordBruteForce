@@ -3,7 +3,6 @@ package org.pva.wfwbf.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.paukov.combinatorics3.Generator;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,13 +18,13 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 @Slf4j
 public class BruteForceService {
 
-    private static final Set<String> dict = new HashSet<>();
+    private static final Map<String, Map<String, Long>> dictStats = new HashMap<>();
 
     static {
-        loadDictionary(dict, "russian_nouns.txt");
-        log.info(String.valueOf(dict.size()));
-        loadDictionary(dict, "answers.txt");
-        log.info(String.valueOf(dict.size()));
+        loadDictionary("russian_nouns.txt");
+        log.info(String.valueOf(dictStats.size()));
+        loadDictionary("answers.txt");
+        log.info(String.valueOf(dictStats.size()));
     }
 
     public Map<Integer, List<String>> bruteForce(String word) {
@@ -33,21 +32,25 @@ public class BruteForceService {
         if (isBlank(word) || word.length() == 1)
             return Collections.emptyMap();
 
-        var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
-
         var combinations = new HashSet<String>();
-        for (var i = 2; i <= chars.size(); i++) {
-            Generator.combination(chars)
-                    .simple(i)
-                    .stream()
-                    .forEach(cmb -> Generator.permutation(cmb)
-                            .simple()
-                            .stream()
-                            .map(elems -> String.join("", elems))
-                            .filter(dict::contains)
-                            .forEach(combinations::add)
-                    );
-        }
+        //***
+        var wordLength = word.length();
+        var chars = Arrays.stream(word.toLowerCase().split("")).collect(Collectors.toList());
+        var wordStat = chars.stream().collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+        dictStats.keySet().parallelStream()
+                .filter(w -> w.length() <= wordLength)
+                .filter(w -> {
+                    var stat = dictStats.get(w);
+                    for (var entry : stat.entrySet()) {
+                        if (!wordStat.containsKey(entry.getKey()))
+                            return false;
+                        if (wordStat.get(entry.getKey()) < entry.getValue())
+                            return false;
+                    }
+                    return true;
+                })
+                .forEach(combinations::add);
+
         //***
         fillAnswerFromForeignApi(combinations, word);
         //***
@@ -77,7 +80,7 @@ public class BruteForceService {
         }
     }
 
-    private static void loadDictionary(final Set<String> dict, String fileName) {
+    private static void loadDictionary(String fileName) {
         String[] lines = null;
         try {
             var res = BruteForceService.class.getResourceAsStream("/" + fileName);
@@ -86,7 +89,11 @@ public class BruteForceService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (lines != null)
-            dict.addAll(Arrays.asList(lines));
+        if (lines != null) {
+            for (String w : lines) {
+                dictStats.put(w, Arrays.stream(w.toLowerCase().split(""))
+                        .collect(Collectors.groupingBy(c -> c, Collectors.counting())));
+            }
+        }
     }
 }
