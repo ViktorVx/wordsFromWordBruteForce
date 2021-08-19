@@ -31,6 +31,9 @@ public class TerminalService {
             exec.scheduleAtFixedRate(this::healthCheck, 0, paramsProvider.getTerminalBotWakeUpTimeout(), TimeUnit.SECONDS);
             schedulerStarted = true;
         }
+    }
+
+    public void logLastHealthCheck() {
         if (lastHealthDate != null && lastHealth != null) {
             log.info(String.format("%s %s", df.format(lastHealthDate), lastHealth == null ? "FAIL" : lastHealth));
         }

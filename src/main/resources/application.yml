@@ -10,3 +10,4 @@ telegram:
       token: ${WFW_TERMINAL_BOT_TOKEN}
       wakeup-url: ${WFWBF_BOT_WAKEUP_URL}
       wakeup-timeout: ${WFWBF_BOT_WAKEUP_TIMEOUT}
+      admins: ${WFWBF_BOT_ADMINS}
